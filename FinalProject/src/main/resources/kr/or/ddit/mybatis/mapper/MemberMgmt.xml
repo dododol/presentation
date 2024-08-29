@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.admin.dao.MemberMgmtDAO">
+
+	<!-- 검색 -->
+	<sql id="searchFrag">
+		<trim prefix="where" prefixOverrides="AND">
+			<if
+				test="simpleCondition neq null and @org.apache.commons.lang3.StringUtils@isNotBlank(simpleCondition.searchWord)">
+				<choose>
+					<when test="simpleCondition.searchType eq 'memId'">
+						AND INSTR(MEM_ID, #{simpleCondition.searchWord}) >
+						0
+					</when>
+				</choose>
+			</if>
+			<if
+				test="simpleCondition neq null and @org.apache.commons.lang3.StringUtils@isNotBlank(variousCondition.memDivision)">
+				<choose>
+					<when test='variousCondition.memDivision eq "H02"'>
+						AND MEM_DIVISION = 'H02'
+					</when>
+					<otherwise>
+						AND WHERE MEM_DIVISION = 'H03'
+					</otherwise>
+
+				</choose>
+			</if>
+		</trim>
+	</sql>
+
+	<!-- 페이징 -->
+	<select id="selectTotalRecord" parameterType="PaginationInfo"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM MEMBER
+		<include refid="searchFrag" />
+	</select>
+
+	<!-- 리스트 -->
+	<select id="selectMemberList" parameterType="PaginationInfo"
+		resultType="MemberVO">
+		WITH ORDEREDBRD AS (
+		SELECT A.*, ROWNUM RNUM
+		FROM (
+		SELECT
+		MEM_ID, MEM_TEL, MEM_MAIL, MEM_ZIP
+		, MEM_ADDR2, MEM_DIVISION
+		, DECODE(MEM_DELETE,'Y','탈퇴회원',' ') MEM_DELETE
+		FROM MEMBER
+
+		<include refid="searchFrag" />
+		ORDER BY MEM_ID DESC
+		)A
+		)
+		SELECT *
+		FROM ORDEREDBRD
+		<![CDATA[
+			WHERE RNUM >= #{startRow} AND RNUM <= #{endRow} 
+		]]>
+	</select>
+
+	<!-- 탈퇴 -->
+	<delete id="deleteMember" parameterType="string">
+		UPDATE MEMBER
+		SET
+		MEM_DELETE = 'Y'
+		WHERE MEM_ID = #{memId}
+	</delete>
+</mapper>
+
+
+
