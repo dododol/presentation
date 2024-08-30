@@ -8,7 +8,7 @@
 		<association property="company" autoMapping="true" />
 	</resultMap>
 
-	<!-- -->
+	<!-- 기업회원정보조회 -->
 	<select id="selectCompany" parameterType="String"
 		resultMap="memberMap">
 		SELECT
@@ -27,27 +27,6 @@
 		MEM_ID=#{memId}
 	</select>
 
-	<!-- 기업회원 정보 수정 -->
-	<update id="updateMember" parameterType="MemberVO">
-		UPDATE MEMBER
-		SET
-		MEM_PASS = #{memPass,jdbcType=VARCHAR}
-		, MEM_TEL =
-		#{memTel,jdbcType=VARCHAR}
-		, MEM_MAIL = #{memMail,jdbcType=VARCHAR}
-		WHERE MEM_ID = #{memId}
-	</update>
-
-	<!-- 기업회원 정보 업데이트 -->
-	<update id="updateCompany" parameterType="MemberVO">
-		UPDATE COMPANY
-		SET
-		COMPANY_DNM = #{companyDnm,jdbcType=VARCHAR}
-		, COMPANY_NM =
-		#{companyNm,jdbcType=VARCHAR}
-		WHERE COMPANY_ID = #{companyId}
-	</update>
-
 	<!-- 기업회원 탈퇴 -->
 	<update id="exitPost" parameterType="String">
 		UPDATE MEMBER
@@ -55,12 +34,6 @@
 		= 'Y'
 		WHERE MEM_ID = #{memId}
 	</update>
-
-	<!-- 기업마이페이지 수정 public int editMemberPost(MemberVO memberVO); //memberVO 
-		: MemberVO(memId=kf001, memPass=1234, memTel=010-3755-2525, memMail=k11@google.com, 
-		memZip=0, memAddr1=null //, memAddr2=null, memDivision=null, memDelete=null, 
-		users=null, //company=CompanyVO(companyId=null, companyNum=0, companyDnm=이서하, 
-		companyNm=null, companyDate=null, //companyPermission=null, companyFile=null)) -->
 
 	<!-- 기업정보 수정 (Member테이블) -->
 	<update id="editMemberPost" parameterType="MemberVO">
